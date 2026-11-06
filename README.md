@@ -25,4 +25,7 @@ Sin dependencias: `server.js` usa sólo módulos nativos de Node.
 `public/data.js` es una muestra curada a mano. El valor `heat` (0–1) es editorial, no viene de una API en vivo.
 
 ## Deploy
+En vivo con GitHub Pages: https://gaboceto09-tech.github.io/mapa-trendy-mx/ (rama `gh-pages` = contenido de `public/`; para actualizar: `git subtree push --prefix public origin gh-pages`).
+
+También funciona en Railway u otro host de Node:
 Railway detecta Node automáticamente y corre `npm start` (usa la variable `PORT`).

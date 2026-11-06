@@ -1,0 +1,173 @@
+:root {
+  --ink: #181425;
+  --paper: #f7f3e3;
+  --paper-2: #e8e1c4;
+  --line: #262b44;
+  --accent: #e43b44;
+  --gold: #feae34;
+  --sky: #0099db;
+  --bg: #3a4466;
+  --px: 4px;
+  --font: "Press Start 2P", ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg); color: var(--ink); font-family: var(--font); }
+button { font-family: var(--font); cursor: pointer; }
+
+/* ── Mapa pixelado ── */
+#map { position: fixed; inset: 0; background: #5a9bd6; }
+.leaflet-container { font-family: var(--font); background: #5a9bd6; }
+.pixel-tiles img { image-rendering: pixelated; image-rendering: crisp-edges; }
+.leaflet-tile-pane { filter: url(#posterize) saturate(1.7) contrast(1.08); }
+.leaflet-heatmap-layer { image-rendering: pixelated; opacity: .85; }
+
+.scanlines {
+  position: fixed; inset: 0; pointer-events: none; z-index: 450;
+  background:
+    repeating-linear-gradient(0deg, rgba(0,0,0,.06) 0 1px, transparent 1px 4px),
+    repeating-linear-gradient(90deg, rgba(0,0,0,.035) 0 1px, transparent 1px 4px);
+}
+
+/* ── Marco estilo RPG ── */
+.box, .dialog, .topbar, .hint {
+  background: var(--paper);
+  border: var(--px) solid var(--ink);
+  box-shadow: inset 0 0 0 var(--px) var(--paper), inset 0 0 0 calc(var(--px) * 2) var(--line), 0 var(--px) 0 rgba(0,0,0,.35);
+  image-rendering: pixelated;
+}
+
+.topbar {
+  position: fixed; top: 12px; left: 12px; right: 12px; z-index: 1000;
+  display: flex; align-items: center; gap: 16px; padding: 12px 16px;
+}
+.logo { font-size: 14px; white-space: nowrap; display: flex; align-items: center; gap: 10px; }
+.logo b { color: var(--accent); }
+.logo-pin { width: 16px; height: 16px; background: var(--accent); box-shadow: inset -4px -4px 0 #9e2835, 0 0 0 3px var(--ink); }
+.regions { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; flex: 1; }
+.regions::-webkit-scrollbar { display: none; }
+
+.btn, .regions button, .filters button {
+  font-size: 10px; padding: 8px 10px; background: var(--paper-2); color: var(--ink);
+  border: 3px solid var(--ink); box-shadow: 0 3px 0 var(--ink); white-space: nowrap;
+}
+.btn:active, .regions button:active, .filters button:active { transform: translateY(3px); box-shadow: none; }
+.regions button.on { background: var(--ink); color: var(--paper); }
+.menu-btn { display: none; font-size: 16px; padding: 6px 10px; }
+
+/* ── Panel lateral ── */
+.panel {
+  position: fixed; top: 92px; right: 12px; bottom: 12px; width: 320px; z-index: 900;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.box { padding: 16px; }
+.box.grow { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.box h2 { font-size: 11px; margin: 0 0 12px; letter-spacing: 1px; }
+.filters { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.filters button { display: flex; align-items: center; gap: 6px; font-size: 9px; text-align: left; }
+.filters button i { width: 10px; height: 10px; flex: none; border: 2px solid var(--ink); }
+.filters button.off { opacity: .4; text-decoration: line-through; }
+.toggle { font-size: 9px; display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.toggle input { accent-color: var(--accent); width: 16px; height: 16px; }
+
+.ranking { list-style: none; padding: 0; margin: 0; overflow-y: auto; flex: 1; }
+.ranking li {
+  display: grid; grid-template-columns: 26px 1fr auto; gap: 8px; align-items: center;
+  padding: 8px 6px; font-size: 9px; line-height: 1.5; cursor: pointer; border-bottom: 2px dashed var(--paper-2);
+}
+.ranking li:hover, .ranking li:focus { background: var(--paper-2); outline: none; }
+.ranking li:hover .name::before { content: "▶ "; color: var(--accent); }
+.ranking .n { color: #8b8b8b; }
+.ranking .city { display: block; color: #6b6b6b; font-size: 7px; margin-top: 2px; }
+.ranking .h { color: var(--accent); }
+.help p { font-size: 8px; margin: 0 0 8px; line-height: 1.6; }
+.help p:last-child { margin: 0; }
+kbd { background: var(--ink); color: var(--paper); padding: 2px 4px; font-family: var(--font); font-size: 7px; }
+
+/* ── Sprites ── */
+.sprite { image-rendering: pixelated; filter: drop-shadow(0 3px 0 rgba(0,0,0,.35)); transition: transform .12s steps(2); }
+.sprite:hover { transform: translateY(-4px) scale(1.1); }
+.spot-icon.sel .sprite { animation: bounce .5s steps(2) infinite; }
+.player-icon .sprite { filter: drop-shadow(0 3px 0 rgba(0,0,0,.4)); }
+.player-icon.walk .sprite { animation: walk .24s steps(2) infinite; }
+.player-icon.left .sprite { transform: scaleX(-1); }
+.player-icon .alert {
+  position: absolute; left: 50%; top: -26px; transform: translateX(-50%);
+  background: var(--paper); border: 3px solid var(--ink); font-size: 10px; padding: 3px 6px; color: var(--accent);
+  animation: bounce .4s steps(2) infinite; display: none;
+}
+.player-icon.near .alert { display: block; }
+.city-label {
+  font-size: 9px; color: var(--paper); text-shadow: 2px 0 var(--ink), -2px 0 var(--ink), 0 2px var(--ink), 0 -2px var(--ink);
+  white-space: nowrap; pointer-events: none;
+}
+@keyframes bounce { 50% { translate: 0 -4px; } }
+@keyframes walk { 50% { translate: 0 -3px; } }
+
+/* ── Cuadro de diálogo ── */
+.dialog {
+  position: fixed; left: 12px; right: 344px; bottom: 12px; z-index: 1000;
+  padding: 20px 24px 22px; max-width: 760px; margin: 0 auto;
+}
+.dialog.hidden, .hint.hidden { display: none; }
+.dialog-head { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.badge { font-size: 8px; color: #fff; padding: 5px 8px; border: 3px solid var(--ink); }
+.dialog-title { font-size: 14px; line-height: 1.4; }
+.dialog-meta { font-size: 9px; color: #6b6b6b; margin: 0 0 12px; }
+.dialog-text { font-size: 11px; line-height: 1.9; margin: 0 0 14px; min-height: 42px; }
+.heatbar { display: flex; align-items: center; gap: 10px; font-size: 9px; }
+.heatbar .bar { flex: 1; max-width: 220px; height: 14px; border: 3px solid var(--ink); background: var(--paper-2); }
+.heatbar i { display: block; height: 100%; background: repeating-linear-gradient(90deg, var(--accent) 0 8px, #f77622 8px 10px); width: 0; transition: width .6s steps(10); }
+.caret { position: absolute; right: 18px; bottom: 12px; font-size: 10px; animation: bounce .6s steps(2) infinite; }
+
+.hint {
+  position: fixed; left: 50%; top: 92px; transform: translateX(-50%); z-index: 1000;
+  font-size: 9px; padding: 12px 16px; white-space: nowrap;
+}
+
+.flash { position: fixed; inset: 0; background: #fff; z-index: 2000; pointer-events: none; opacity: 0; }
+.flash.go { animation: flash .45s steps(3); }
+@keyframes flash { 0%, 66% { opacity: .9; } 33%, 100% { opacity: 0; } }
+
+/* ── Leaflet en pixel ── */
+.leaflet-control-zoom { border: 4px solid var(--ink) !important; border-radius: 0 !important; box-shadow: 0 4px 0 rgba(0,0,0,.35) !important; }
+.leaflet-control-zoom a { border-radius: 0 !important; background: var(--paper) !important; color: var(--ink) !important; font-family: var(--font); font-size: 14px !important; }
+.leaflet-top.leaflet-left { top: 84px; }
+.leaflet-control-attribution { font-family: system-ui, sans-serif; font-size: 9px; background: rgba(247,243,227,.85) !important; }
+.leaflet-bottom.leaflet-right { right: 340px; }
+
+/* ── Controles de juego (táctil) ── */
+.pad { display: none; }
+.pad button {
+  background: var(--paper-2); border: 3px solid var(--ink); box-shadow: 0 3px 0 var(--ink);
+  font-size: 12px; color: var(--ink); touch-action: none; user-select: none; -webkit-user-select: none;
+}
+.pad button:active { transform: translateY(3px); box-shadow: none; }
+
+@media (max-width: 860px) {
+  .topbar { padding: 8px 10px; gap: 10px; top: 8px; left: 8px; right: 8px; }
+  .logo { font-size: 10px; }
+  .logo-pin { width: 12px; height: 12px; }
+  .menu-btn { display: block; }
+  .panel { top: 72px; right: 8px; left: 8px; bottom: auto; max-height: 60vh; width: auto; display: none; }
+  .panel.open { display: flex; }
+  .panel .help { display: none; }
+  .dialog { left: 8px; right: 8px; bottom: 150px; padding: 16px; }
+  .dialog-title { font-size: 11px; }
+  .dialog-text { font-size: 9px; }
+  .leaflet-top.leaflet-left { top: 64px; }
+  .leaflet-bottom.leaflet-right { right: 0; }
+  .hint { top: 70px; }
+  .pad {
+    display: flex; justify-content: space-between; align-items: center;
+    position: fixed; left: 16px; right: 16px; bottom: 24px; z-index: 950; pointer-events: none;
+  }
+  .dpad { display: grid; grid-template-columns: repeat(3, 40px); grid-template-rows: repeat(3, 40px); pointer-events: auto; }
+  .dpad [data-dir=up] { grid-area: 1 / 2; }
+  .dpad [data-dir=left] { grid-area: 2 / 1; }
+  .dpad [data-dir=right] { grid-area: 2 / 3; }
+  .dpad [data-dir=down] { grid-area: 3 / 2; }
+  .ab { display: flex; gap: 12px; pointer-events: auto; align-items: flex-end; }
+  .ab button { width: 52px; height: 52px; border-radius: 50%; font-size: 14px; }
+  .ab #aBtn { background: var(--accent); color: #fff; margin-bottom: 24px; }
+}

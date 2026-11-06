@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>Mapa Trendy MX</title>
+  <meta name="description" content="Explora los spots más trendy de México en un mapa retro pixel-art con heat map." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8' shape-rendering='crispEdges'><rect width='8' height='8' fill='%23181425'/><rect x='1' y='1' width='6' height='6' fill='%23e43b44'/><rect x='3' y='2' width='2' height='4' fill='%23fff'/></svg>" />
+</head>
+<body>
+  <!-- filtro SVG para posterizar el mapa (look retro 16-bit) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <filter id="posterize" color-interpolation-filters="sRGB">
+      <feComponentTransfer>
+        <feFuncR type="discrete" tableValues="0.09 0.25 0.45 0.62 0.8 0.95" />
+        <feFuncG type="discrete" tableValues="0.08 0.3 0.5 0.68 0.84 0.96" />
+        <feFuncB type="discrete" tableValues="0.15 0.32 0.5 0.66 0.82 0.92" />
+      </feComponentTransfer>
+    </filter>
+  </svg>
+
+  <header class="topbar">
+    <div class="logo"><span class="logo-pin"></span>MAPA TRENDY <b>MX</b></div>
+    <nav class="regions" id="regions" aria-label="Regiones"></nav>
+    <button class="btn menu-btn" id="menuBtn" aria-label="Abrir guía">≡</button>
+  </header>
+
+  <div id="map" aria-label="Mapa de México"></div>
+  <div class="scanlines" aria-hidden="true"></div>
+  <div class="flash" id="flash" aria-hidden="true"></div>
+
+  <aside class="panel" id="panel">
+    <div class="box">
+      <h2>FILTROS</h2>
+      <div class="filters" id="filters"></div>
+      <label class="toggle"><input type="checkbox" id="heatToggle" checked /> <span>HEAT MAP</span></label>
+    </div>
+    <div class="box grow">
+      <h2>🔥 TOP TRENDING</h2>
+      <ol class="ranking" id="ranking"></ol>
+    </div>
+    <div class="box help">
+      <p><kbd>←↑↓→</kbd> / <kbd>WASD</kbd> caminar</p>
+      <p><kbd>ENTER</kbd> / <kbd>Z</kbd> explorar spot</p>
+      <p><kbd>ESC</kbd> / <kbd>X</kbd> cerrar</p>
+    </div>
+  </aside>
+
+  <div class="dialog hidden" id="dialog" role="dialog" aria-live="polite">
+    <div class="dialog-head">
+      <span class="badge" id="dBadge"></span>
+      <span class="dialog-title" id="dTitle"></span>
+    </div>
+    <p class="dialog-meta" id="dMeta"></p>
+    <p class="dialog-text" id="dText"></p>
+    <div class="heatbar"><span>HEAT</span><div class="bar"><i id="dHeat"></i></div><b id="dHeatNum"></b></div>
+    <span class="caret">▼</span>
+  </div>
+
+  <div class="hint hidden" id="hint">¡Hay algo aquí! Presiona <b>A</b></div>
+
+  <div class="pad" aria-label="Controles">
+    <div class="dpad">
+      <button data-dir="up" aria-label="Arriba">▲</button>
+      <button data-dir="left" aria-label="Izquierda">◀</button>
+      <button data-dir="right" aria-label="Derecha">▶</button>
+      <button data-dir="down" aria-label="Abajo">▼</button>
+    </div>
+    <div class="ab">
+      <button id="bBtn" aria-label="Cerrar">B</button>
+      <button id="aBtn" aria-label="Explorar">A</button>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
